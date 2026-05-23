@@ -26,6 +26,9 @@ const User = require('./model/user');
 const port = 3000;
 const urlRoutes = require('./routes/url');
 
+const suggestionRoutes = require('./routes/suggestionRoutes');
+// ... after your other app.use() lines:
+app.use('/suggestions', protect, suggestionRoutes);
 // In-memory "database" to store URLs.
 // Note: This data will be lost when the server restarts.
 const urlDatabase = new Map();
@@ -122,6 +125,9 @@ app.get('/services/:serviceKey', protect, (req, res) => {
         return res.render('home', buildShortenerViewModel(req));
     }
 
+    if (service.key === 'suggestion-tool') {
+        return res.redirect('/suggestions');
+    }
     if (service.key === 'file-upload') {
         return res.render('file-upload');
     }
