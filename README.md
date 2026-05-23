@@ -297,6 +297,42 @@ Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information
 
 ---
 
+## 🌟 Our Contributors
+
+We're proud to be part of **GSSoC 2026** 🚀. This project is built by our amazing community of contributors who share the vision of empowering creators worldwide.
+
+<div align="center">
+
+### Meet Our Community
+
+<a href="https://github.com/aashutoshkumarbhardwaj/CreatorOs/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=aashutoshkumarbhardwaj/CreatorOs" alt="Contributors" style="max-width: 100%; border-radius: 10px;"/>
+</a>
+
+<br/>
+
+<a href="https://github.com/aashutoshkumarbhardwaj/CreatorOs/graphs/contributors">
+  <img src="https://img.shields.io/badge/View%20All%20Contributors-7C4DFF?style=for-the-badge" alt="View Contributors" />
+</a>
+
+### Want to Join Our Community?
+
+Every contribution, no matter how small, helps us build something amazing for creators. Here's how you can get involved:
+
+1. **Pick an Issue** - Browse our [open issues](https://github.com/aashutoshkumarbhardwaj/CreatorOs/issues) and find something that interests you
+2. **Fork & Create Branch** - Fork the repo and create a feature branch
+3. **Make Your Changes** - Implement your feature or fix
+4. **Submit PR** - Open a pull request with a clear description
+5. **Get Recognized** - Your contribution will be visible on this README! 🎉
+
+> 💡 **First time contributing?** Start with issues labeled `good first issue` or `help-wanted`. We're here to help!
+
+**Special Recognition:** This project is part of **[GSSoC (Girl Script Summer of Code) 2026](https://www.gssoc.girlscript.tech/)** — helping beginners and experienced developers contribute to open source.
+
+</div>
+
+---
+
 ## 📬 Connect
 
 <div align="center">
