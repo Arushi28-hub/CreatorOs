@@ -64,6 +64,8 @@ if (googleAuthConfigured) {
         )
     );
 }
+const { signup, login } = require("../controller/auth");
+const { signupValidator, loginValidator } = require("../middleware/validateAuth");
 
 router.get("/signup", (req, res) => {
     res.render("signup");
@@ -83,7 +85,9 @@ router.get("/login", (req, res) => {
     });
 });
 
-router.post("/login", login);
+router.post("/signup", signupValidator, signup);
+
+router.post("/login", loginValidator, login);
 
 router.get("/auth/google", (req, res, next) => {
     if (!googleAuthConfigured) {
@@ -111,8 +115,8 @@ router.get("/auth/google/callback", (req, res, next) => {
 
 router.get("/logout", (req, res) => {
     res.clearCookie("token");
-
     res.redirect("/login");
 });
 
+module.exports = router;
 module.exports = router;
