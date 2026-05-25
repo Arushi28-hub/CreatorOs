@@ -1,0 +1,29 @@
+name: Contributor Welcome
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome Contributor
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `Thanks for contributing to CreatorOS 🚀
+
+If you find this project useful, consider giving it a ⭐ on GitHub.
+It helps the project grow and motivates contributors.
+
+Thanks again for contributing! 🙌`
+            })
