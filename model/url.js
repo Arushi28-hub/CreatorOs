@@ -1,25 +1,44 @@
-const mongoose= require('mongoose');
+const mongoose = require("mongoose");
 
-const urlSchema= new mongoose.Schema({
+const urlSchema = new mongoose.Schema({
     shortId: {
         type: String,
         required: true,
         unique: true,
     },
-    
+
     redirectUrl: {
-            type: String,
-            required: true,
-        },
+        type: String,
+        required: true,
+    },
+
     totalClicks: {
-            type: Number,
-            default: 0,
+        type: Number,
+        default: 0,
+    },
+
+    createdAt: [
+        {
+            timeStamp: {
+                type: Date,
+                default: Date.now,
+            },
         },
-     createdAt: [{timeStamp: {type: Date, default: Date.now}}]
-    
+    ],
+    visitHistory: [
+  {
+    timestamp: {
+      type: Date,
+      default: Date.now
+    }
+  }
+]
+
 });
 
-const MongooseUrlModel = mongoose.model('Url', urlSchema);
+// FIX FOR VERCEL / HOT RELOAD
+const MongooseUrlModel =
+    mongoose.models.Url || mongoose.model("Url", urlSchema);
 
 // In-memory array for mock URLs
 const mockUrls = [];
@@ -33,12 +52,16 @@ class MockUrlModel {
     }
 
     async save() {
-        const existing = mockUrls.find(u => u.shortId === this.shortId);
+        const existing = mockUrls.find(
+            (u) => u.shortId === this.shortId
+        );
+
         if (existing) {
             Object.assign(existing, this);
         } else {
             mockUrls.push(this);
         }
+
         return this;
     }
 
@@ -49,23 +72,17 @@ class MockUrlModel {
     }
 
     static async findOne(query) {
-        const found = mockUrls.find(u => u.shortId === query.shortId);
-        return found ? new MockUrlModel(found) : null;
+        const found = mockUrls.find(
+            (u) => u.shortId === query.shortId
+        );
+
+        return found
+            ? new MockUrlModel(found)
+            : null;
     }
 }
 
-module.exports = new Proxy({}, {
-    get(target, prop) {
-        if (process.env.USE_MOCK_DB === "true") {
-            return MockUrlModel[prop] || MockUrlModel;
-        }
-        return MongooseUrlModel[prop];
-    },
-    construct(target, args) {
-        if (process.env.USE_MOCK_DB === "true") {
-            return new MockUrlModel(...args);
-        }
-        return new MongooseUrlModel(...args);
-    }
-});
-    
+module.exports =
+    process.env.USE_MOCK_DB === "true"
+        ? MockUrlModel
+        : MongooseUrlModel;
