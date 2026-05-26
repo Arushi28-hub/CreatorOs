@@ -3,215 +3,485 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup | CreatorOS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Signup | Titli 🦋</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #06101f;
-            --bg-2: #0b1730;
-            --panel: rgba(13, 24, 49, 0.72);
-            --border: rgba(148, 163, 184, 0.18);
-            --text: #f8fafc;
-            --muted: #cbd5e1;
+            --bg-gradient: linear-gradient(135deg, #1e3a8a, #3b0764);
+            --panel-glass: rgba(255, 255, 255, 0.05);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
             --accent: #22d3ee;
-            --accent-2: #38bdf8;
+            --accent-hover: #67e8f9;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            min-height: 100vh;
             font-family: 'Poppins', sans-serif;
-            color: var(--text);
-            background:
-                radial-gradient(900px 320px at 50% -80px, rgba(56, 189, 248, 0.24), transparent 70%),
-                radial-gradient(720px 260px at 85% 0%, rgba(34, 211, 238, 0.18), transparent 70%),
-                linear-gradient(180deg, var(--bg-2), var(--bg));
-            overflow-x: hidden;
-        }
-
-        .auth-shell {
-            position: relative;
-            isolation: isolate;
+            background: var(--bg-gradient);
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: 2rem 1rem;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 16px;
         }
 
-        .auth-shell::before,
-        .auth-shell::after {
-            content: '';
+        /* ── Particle Canvas ── */
+        canvas#bg {
             position: fixed;
-            border-radius: 999px;
-            filter: blur(22px);
-            opacity: 0.18;
+            inset: 0;
+            z-index: 1;
             pointer-events: none;
-            z-index: -1;
         }
 
-        .auth-shell::before {
-            top: 7rem;
-            left: -4rem;
-            width: 16rem;
-            height: 16rem;
-            background: #0ea5e9;
+        /* ── Ambient Glow Orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 2;
+            transition: transform 0.1s ease;
+        }
+        .o1 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, #a855f7, transparent 70%);
+            top: -60px; right: -40px;
+        }
+        .o2 {
+            width: 340px; height: 340px;
+            background: radial-gradient(circle, #1e3a8a, transparent 70%);
+            bottom: -80px; left: -60px;
+            opacity: 0.35;
+        }
+        .o3 {
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, #06b6d4, transparent 70%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
         }
 
-        .auth-shell::after {
-            right: -5rem;
-            bottom: 7rem;
-            width: 18rem;
-            height: 18rem;
-            background: #22d3ee;
+        /* ── Auth Card ── */
+        .card {
+            position: relative;
+            z-index: 10;
+            width: min(440px, 100%);
+            padding: 44px 40px;
+            background: var(--panel-glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-glass);
+            border-radius: 28px;
+            box-shadow:
+                0 0 0 1px rgba(168, 85, 247, 0.06),
+                0 30px 60px rgba(0, 0, 0, 0.4);
+            color: var(--text-main);
+            opacity: 0;
+            transform: translateY(32px) scale(0.97);
         }
 
-        .auth-card {
-            width: min(460px, 100%);
-            padding: 2rem;
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            background: var(--panel);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition:
+                opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.3s,
+                box-shadow 0.3s;
         }
 
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            color: var(--text);
-            text-decoration: none;
+        .card:hover {
+            border-color: rgba(34, 211, 238, 0.25);
+            box-shadow:
+                0 0 0 1px rgba(34, 211, 238, 0.1),
+                0 0 50px rgba(34, 211, 238, 0.05),
+                0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ── Floating Tags ── */
+        .ftag {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+        }
+        .t1 {
+            top: 18px; left: 18px;
+            background: rgba(34, 211, 238, 0.12);
+            color: #22d3ee;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+        .t2 {
+            top: 18px; right: 18px;
+            background: rgba(168, 85, 247, 0.12);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        /* ── Brand ── */
+        .logo-wrap { text-align: center; margin-bottom: 26px; }
+
+        .logo {
+            font-size: 26px;
             font-weight: 800;
-            letter-spacing: 0;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 50%;
+            transform: translateX(-50%);
+            width: 40px; height: 2px;
+            background: linear-gradient(90deg, #22d3ee, #a855f7);
+            border-radius: 2px;
         }
 
-        .brand-mark {
-            width: 2.4rem;
-            height: 2.4rem;
-            border-radius: 0.9rem;
-            display: grid;
-            place-items: center;
-            color: #082f49;
-            background: linear-gradient(135deg, #67e8f9, var(--accent-2));
-            box-shadow: 0 10px 30px rgba(34, 211, 238, 0.28);
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(2rem, 5vw, 2.6rem);
-            line-height: 1.1;
-            letter-spacing: 0;
+        .title {
+            font-size: 27px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            text-align: center;
+            margin-bottom: 6px;
         }
 
         .subtitle {
-            margin: 0.8rem 0 1.8rem;
-            color: var(--muted);
-            line-height: 1.7;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: center;
         }
 
-        form {
-            display: grid;
-            gap: 1rem;
+        /* ── Error Banner ── */
+        .error-banner {
+            border-left: 4px solid #ef4444;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+            font-size: 0.85rem;
+            margin: 16px 0 0;
+            line-height: 1.4;
         }
+
+        /* ── Form Fields ── */
+        .fields { display: flex; flex-direction: column; gap: 13px; margin-top: 26px; }
+
+        .field-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: 999px;
+        }
+        .field-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.12), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 999px;
+        }
+        .field-wrap:focus-within::before { transform: translateX(100%); }
 
         input {
             width: 100%;
-            border: 1px solid rgba(148, 163, 184, 0.18);
+            padding: 13px 22px;
             border-radius: 999px;
-            padding: 0.95rem 1.1rem;
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.06);
-            font: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            position: relative;
+            z-index: 1;
         }
-
-        input::placeholder {
-            color: rgba(203, 213, 225, 0.74);
-        }
-
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
         input:focus {
-            border-color: rgba(34, 211, 238, 0.8);
-            box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.12);
+            border-color: var(--accent);
             background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08), 0 0 20px rgba(34, 211, 238, 0.08);
         }
 
-        button {
-            border: 0;
+        /* ── Submit Button ── */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
             border-radius: 999px;
-            padding: 0.95rem 1.2rem;
-            color: #042f3e;
-            background: linear-gradient(135deg, #67e8f9, var(--accent-2));
-            box-shadow: 0 16px 32px rgba(34, 211, 238, 0.22);
-            font: inherit;
-            font-weight: 800;
-            cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.03);
-        }
-
-        .switch-link {
-            margin: 1.4rem 0 0;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .switch-link a {
-            color: #67e8f9;
+            background: linear-gradient(135deg, #22d3ee, #0284c7);
+            color: #041e3a;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
             font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.3s, filter 0.2s;
+            box-shadow: 0 8px 24px rgba(34, 211, 238, 0.2);
+        }
+        .btn:hover {
+            box-shadow: 0 14px 36px rgba(34, 211, 238, 0.38);
+            filter: brightness(1.08);
+        }
+        .btn:active { transform: translateY(1px) !important; }
+        .btn.loading { opacity: 0.7; cursor: wait; }
+
+        /* ── Switch Link ── */
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .switch-link a {
+            color: var(--accent);
+            font-weight: 600;
             text-decoration: none;
+            margin-left: 4px;
+            transition: color 0.2s;
+        }
+        .switch-link a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
         }
 
-        .error-banner {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            text-align: center;
+        /* ── Keyframes ── */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%       { transform: translateX(-6px); }
+            40%       { transform: translateX(6px); }
+            60%       { transform: translateX(-4px); }
+            80%       { transform: translateX(4px); }
+        }
+        @keyframes ripple {
+            to { width: 300px; height: 300px; opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <main class="auth-shell">
-        <section class="auth-card">
-            <a class="brand" href="/">
-                <span class="brand-mark">C</span>
-                <span>CreatorOS</span>
-            </a>
 
-            <h1>Create account</h1>
-            <p class="subtitle">Join CreatorOS and start using the creator tools built for fast, clean workflows.</p>
+    <canvas id="bg"></canvas>
+    <div class="orb o1" id="orb1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
 
-            <% if (typeof error !== 'undefined' && error) { %>
-                <div class="error-banner">
-                    <%= error %>
+    <div class="card" id="card">
+        <span class="ftag t1" id="t1">SECURE</span>
+        <span class="ftag t2" id="t2">FREE</span>
+
+        <div class="logo-wrap">
+            <a href="/" class="logo">Titli 🦋</a>
+        </div>
+        <div class="title">Create Account</div>
+        <p class="subtitle">Join Titli and deploy ultra-fast workflows for your short links.</p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-banner" role="alert"><%= error %></div>
+        <% } %>
+
+        <form action="/signup" method="POST" id="signup-form">
+            <div class="fields">
+                <div class="field-wrap">
+                    <input type="text"     name="name"     id="f1" placeholder="Full Name"     required />
                 </div>
-            <% } %>
+                <div class="field-wrap">
+                    <input type="email"    name="email"    id="f2" placeholder="Email Address" required />
+                </div>
+                <div class="field-wrap">
+                    <input type="password" name="password" id="f3" placeholder="Password"      required />
+                </div>
+                <button type="submit" class="btn" id="sbtn" data-loading-text="Creating Account...">
+                    Get Started Free
+                </button>
+            </div>
+        </form>
 
-            <form action="/signup" method="POST">
-                <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Signup</button>
-            </form>
+        <p class="switch-link">Already have an account? <a href="/login">Login here</a></p>
+    </div>
 
-            <p class="switch-link">
-                Already have an account?
-                <a href="/login">Login</a>
-            </p>
-        </section>
-    </main>
+    <script>
+    (function () {
+
+        // ── Particle grid (purple + cyan to match home page) ───
+        const canvas = document.getElementById('bg');
+        const ctx    = canvas.getContext('2d');
+        let W, H, pts = [];
+        const mouse  = { x: -999, y: -999 };
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+            makePts();
+        }
+
+        function makePts() {
+            pts = [];
+            const cols = Math.floor(W / 56);
+            const rows = Math.floor(H / 56);
+            for (let r = 0; r <= rows; r++) {
+                for (let c = 0; c <= cols; c++) {
+                    const ox = c * (W / cols);
+                    const oy = r * (H / rows);
+                    pts.push({
+                        ox, oy, x: ox, y: oy,
+                        vx: 0, vy: 0,
+                        size:  Math.random() * 1.1 + 0.4,
+                        alpha: Math.random() * 0.35 + 0.08,
+                        hue:   Math.random() < 0.5 ? '34,211,238' : '168,85,247'
+                    });
+                }
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        document.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        document.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
+
+        function loop() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Connecting lines — purple tint
+            for (let i = 0; i < pts.length; i++) {
+                for (let j = i + 1; j < pts.length; j++) {
+                    const dx = pts[i].x - pts[j].x;
+                    const dy = pts[i].y - pts[j].y;
+                    const d  = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 65) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(168,85,247,${0.05 * (1 - d / 65)})`;
+                        ctx.lineWidth   = 0.5;
+                        ctx.moveTo(pts[i].x, pts[i].y);
+                        ctx.lineTo(pts[j].x, pts[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Dots
+            pts.forEach(p => {
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const d  = Math.sqrt(dx * dx + dy * dy);
+                const f  = d < 100 ? (100 - d) / 100 : 0;
+                if (f > 0) {
+                    p.vx -= (dx / d) * f * 1.1;
+                    p.vy -= (dy / d) * f * 1.1;
+                }
+                p.vx += (p.ox - p.x) * 0.04;
+                p.vy += (p.oy - p.y) * 0.04;
+                p.vx *= 0.82; p.vy *= 0.82;
+                p.x  += p.vx; p.y  += p.vy;
+
+                const md   = Math.sqrt((mouse.x - p.x) ** 2 + (mouse.y - p.y) ** 2);
+                const glow = md < 120 ? 1 - md / 120 : 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size + glow * 1.6, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${p.hue},${p.alpha + glow * 0.55})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // ── Card entrance ──────────────────────────────────────
+        setTimeout(() => document.getElementById('card').classList.add('visible'), 80);
+
+        // ── Staggered field entrance ───────────────────────────
+        ['f1', 'f2', 'f3'].forEach((id, i) => {
+            const el = document.getElementById(id).parentElement;
+            el.style.opacity    = '0';
+            el.style.transform  = 'translateX(-16px)';
+            el.style.transition = `opacity 0.5s ${0.5 + i * 0.12}s, transform 0.5s ${0.5 + i * 0.12}s`;
+            setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateX(0)'; }, 100);
+        });
+
+        // ── Floating tags ──────────────────────────────────────
+        ['t1', 't2'].forEach((id, i) => {
+            const el = document.getElementById(id);
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.5s, transform 0.5s';
+                el.style.opacity    = '1';
+                el.style.transform  = 'translateY(0)';
+            }, 900 + i * 160);
+        });
+
+        // ── Orb parallax ───────────────────────────────────────
+        document.addEventListener('mousemove', e => {
+            const cx = window.innerWidth  / 2;
+            const cy = window.innerHeight / 2;
+            document.getElementById('orb1').style.transform =
+                `translate(${(e.clientX - cx) * 0.025}px, ${(e.clientY - cy) * 0.025}px)`;
+        });
+
+        // ── Magnetic button ────────────────────────────────────
+        const btn = document.getElementById('sbtn');
+        btn.addEventListener('mousemove', e => {
+            const r = btn.getBoundingClientRect();
+            const x = (e.clientX - r.left - r.width  / 2) * 0.22;
+            const y = (e.clientY - r.top  - r.height / 2) * 0.22;
+            btn.style.transform = `translate(${x}px, ${y}px) translateY(-3px)`;
+        });
+        btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+
+        // ── Ripple + loading on submit ─────────────────────────
+        document.getElementById('signup-form').addEventListener('submit', function () {
+            if (btn.classList.contains('loading')) return;
+            btn.classList.add('loading');
+            btn.textContent = btn.dataset.loadingText;
+
+            const span = document.createElement('span');
+            span.style.cssText =
+                'position:absolute;top:50%;left:50%;width:0;height:0;' +
+                'background:rgba(255,255,255,0.25);border-radius:50%;' +
+                'transform:translate(-50%,-50%);pointer-events:none;' +
+                'animation:ripple 0.6s ease-out forwards';
+            btn.appendChild(span);
+        });
+
+        // ── Input shake on invalid ─────────────────────────────
+        document.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('invalid', e => {
+                e.preventDefault();
+                inp.style.animation = 'none';
+                void inp.offsetWidth;
+                inp.style.animation   = 'shake 0.4s ease';
+                inp.style.borderColor = '#f87171';
+                inp.style.boxShadow   = '0 0 0 3px rgba(248,113,113,0.12)';
+                setTimeout(() => {
+                    inp.style.borderColor = '';
+                    inp.style.boxShadow   = '';
+                }, 1200);
+            });
+        });
+
+    })();
+    </script>
 </body>
 </html>
