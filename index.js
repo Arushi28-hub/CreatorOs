@@ -89,6 +89,8 @@ const Url = require('./model/url');
 app.use('/api/urls', urlRoutes);
 
 app.use("/api/analytics", protect, analyticsRoutes);
+const settingsRoutes = require('./routes/settings');
+app.use('/api/settings', protect, settingsRoutes);
 
 const uploadDir = "/tmp";
 
@@ -124,10 +126,56 @@ function buildAccountViewModel(userDoc, fallbackUser) {
         .map((part) => part[0].toUpperCase())
         .join('') || 'CR';
 
+    const passwordChangedAt = userDoc?.passwordChangedAt || userDoc?.updatedAt || null;
+    let passwordAgeDays = null;
+    if (passwordChangedAt) {
+        passwordAgeDays = Math.max(
+            0,
+            Math.floor((Date.now() - new Date(passwordChangedAt).getTime()) / (1000 * 60 * 60 * 24))
+        );
+    }
+
+    const sub = userDoc?.subscription || {};
+    const nextInvoice = sub.nextInvoiceDate
+        ? new Date(sub.nextInvoiceDate)
+        : (() => {
+            const d = new Date();
+            d.setMonth(d.getMonth() + 1);
+            d.setDate(24);
+            return d;
+        })();
+
     return {
         id: fallbackUser.id,
         name,
         email: userDoc?.email || fallbackUser?.email || '',
+        alias: userDoc?.alias || '',
+        bio: userDoc?.bio || '',
+        twoFactorEnabled: userDoc?.twoFactorEnabled || false,
+        preferences: userDoc?.preferences || {
+            appearanceMode: 'light',
+            interfaceDensity: 'tactile',
+            motionEffects: true,
+            soundCues: false,
+            autoSaveLinks: true
+        },
+        passwordAgeDays,
+        billing: {
+            planName: sub.planName || 'Pro Individual',
+            priceMonthly: sub.priceMonthly ?? 29,
+            nextInvoiceLabel: nextInvoice.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+            }),
+            estimatedTotal: `$${(sub.priceMonthly ?? 29).toFixed(2)} USD`,
+            cardBrand: sub.cardBrand || 'VISA',
+            cardLast4: sub.cardLast4 || '4242',
+            invoices: [
+                { date: 'Sep 24, 2023', invoiceId: '#INV-88219', amount: '$29.00', status: 'PAID' },
+                { date: 'Aug 24, 2023', invoiceId: '#INV-87112', amount: '$29.00', status: 'PAID' },
+            ],
+        },
         initials,
     };
 }
@@ -148,8 +196,10 @@ function buildEmptyInviteSummary() {
 app.get("/dashboard", protect, asyncHandler(async (req, res) => {
     const userDoc = isGuestContributor(req.user)
         ? null
-        : await User.findById(req.user.id).select('name email').lean();
-
+        : await User.findById(req.user.id)
+            .select('name email alias bio twoFactorEnabled preferences passwordChangedAt updatedAt subscription')
+            .lean();
+    
     const inviteSummary = isGuestContributor(req.user)
         ? buildEmptyInviteSummary()
         : await Promise.all([
