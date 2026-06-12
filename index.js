@@ -291,6 +291,21 @@ app.get("/profile", protect, asyncHandler(async (req, res) => {
     res.render("profile", { user: buildAccountViewModel(userDoc, req.user) });
 }));
 
+// Settings
+app.get('/settings', protect, asyncHandler(async (req, res) => {
+    const userDoc = isGuestContributor(req.user)
+        ? null
+        : await User.findById(req.user.id)
+            .select('name email alias bio twoFactorEnabled preferences passwordChangedAt updatedAt subscription')
+            .lean();
+
+    res.render('settings', {
+        services,
+        user: buildAccountViewModel(userDoc, req.user),
+        isGuestContributor: isGuestContributor(req.user),
+    });
+}));
+
 // Analytics
 app.get('/analytics', protect, asyncHandler(async (req, res) => {
     const userDoc = await User.findById(req.user.id)
