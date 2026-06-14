@@ -121,7 +121,7 @@
         feedEl.querySelectorAll('.analytics-btn').forEach((btn) => {
             btn.addEventListener('click', async () => {
                 try {
-                    const data = await apiRequest(`/url/analytics/${btn.dataset.id}`);
+                    const data = await apiRequest(`/api/urls/analytics/${btn.dataset.id}`);
                     showToast(`${data.totalClicks} total clicks recorded`);
                 } catch (err) {
                     showToast(err.message, true);
@@ -167,7 +167,7 @@
 
     async function loadLinks() {
         try {
-            const data = await apiRequest('/url');
+            const data = await apiRequest('/api/urls');
             allLinks = data.links || [];
             updateStats(data.stats || { totalLinks: 0, totalClicksLabel: '0', topLinkTitle: '—' });
             if (data.domain) {
@@ -187,7 +187,7 @@
         btn.disabled = true;
 
         try {
-            const payload = await apiRequest('/url', {
+            const payload = await apiRequest('/api/urls', {
                 method: 'POST',
                 body: JSON.stringify({
                     redirectUrl: document.getElementById('redirect-url').value.trim(),
