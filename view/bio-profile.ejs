@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- SEO meta tags -->
+  <%- include('./partials/_seo', {
+    title: profile.name,
+    description: profile.bio || (profile.name + '\'s CreatorOS profile'),
+    canonical: 'https://titli-link-shortner.vercel.app/' + profile.username
+  }) %>
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= profile.name %> | CreatorOS Bio</title>
   <meta name="description" content="<%= profile.bio %>" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>

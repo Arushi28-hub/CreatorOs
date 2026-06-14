@@ -83,6 +83,10 @@ app.use('/suggestions', protect, suggestionRoutes);
 app.use('/services/creator-crm', protect, collaborationRoutes);
 app.post('/dashboard/accept-invite', protect, preventContributorWrites, acceptInviteFromDashboard);
 app.get('/invites/accept/:token', acceptInvite);
+app.get('/services/bio-builder', (req, res) => {
+    res.render('bio-builder');
+});
+
 
 const Url = require('./model/url');
 
@@ -504,6 +508,42 @@ app.get('/u/:shortId', asyncHandler(async (req, res) => {
         return res.status(500).send('Server error');
     }
 }));
+
+// ── SITEMAP ─────────────────────────────────────────────
+app.get('/sitemap.xml', (req, res) => {
+    const baseUrl = 'https://titli-link-shortner.vercel.app';
+
+    const urls = [
+        '/',
+        '/login',
+        '/signup',
+        '/services',
+        '/dashboard',
+        '/profile',
+        '/analytics',
+        '/vault',
+        '/bio',
+        '/settings',
+        '/suggestions',
+        '/my-links',
+        '/dm-automation',
+        '/services/creator-crm'
+    ];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(url => `
+    <url>
+        <loc>${baseUrl}${url}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>${url === '/' ? '1.0' : '0.7'}</priority>
+    </url>
+`).join('')}
+</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+});
 
 // ── ERROR HANDLER — must be last ──
 
